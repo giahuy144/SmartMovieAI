@@ -1,4 +1,5 @@
 using System.Text;
+using AuthService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -6,6 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
+builder.Services.AddSingleton<IUserStore, UserStore>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 // Swagger với hỗ trợ Authorization Bearer Token
 builder.Services.AddSwaggerGen(c =>
@@ -75,10 +80,11 @@ app.UseSwaggerUI();
 
 app.UseCors("AllowAll");
 
+app.UseStaticFiles();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
-

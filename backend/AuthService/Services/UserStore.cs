@@ -1,3 +1,4 @@
+using AuthService.Data;
 using AuthService.Models;
 
 namespace AuthService.Services;
@@ -8,33 +9,26 @@ public interface IUserStore
     User Create(string userName, string passwordHash);
 }
 
-public class UserStore : IUserStore
+public class SqlUserStore : IUserStore
 {
-    private readonly object _lock = new();
-    private readonly List<User> _users;
+    private readonly AuthDbContext _db;
 
-    public UserStore(IPasswordHasher passwordHasher)
-    {
-        _users =
-        [
-            new User { IdUser = 1, UserName = "use1", PasswordHash = passwordHasher.Hash("123") },
-            new User { IdUser = 2, UserName = "user2", PasswordHash = passwordHasher.Hash("123") }
-        ];
-    }
+    public SqlUserStore(AuthDbContext db) => _db = db;
 
-    public User? FindByUserName(string userName)
-    {
-        lock (_lock)
-            return _users.FirstOrDefault(user => user.UserName.Equals(userName, StringComparison.OrdinalIgnoreCase));
-    }
+    public User? FindByUserName(string userName) =>
+        _db.Users.FirstOrDefault(user => user.UserName == userName);
 
     public User Create(string userName, string passwordHash)
     {
-        lock (_lock)
+        var user = new User
         {
-            var user = new User { IdUser = _users.Count + 1, UserName = userName, PasswordHash = passwordHash };
-            _users.Add(user);
-            return user;
-        }
+            UserName = userName,
+            Email = $"{userName.Trim().ToLowerInvariant()}@smartmovie.local",
+            PasswordHash = passwordHash
+        };
+
+        _db.Users.Add(user);
+        _db.SaveChanges();
+        return user;
     }
 }

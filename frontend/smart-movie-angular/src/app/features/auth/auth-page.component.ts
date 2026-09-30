@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 
-@Component({ selector: 'app-auth-page', templateUrl: './auth-page.component.html', styleUrls: ['../../../app.component.css'] })
+@Component({ selector: 'app-auth-page', templateUrl: './auth-page.component.html' })
 export class AuthPageComponent {
   activeTab: 'login' | 'register' = 'login';
   formData = { userName: '', password: '', confirmPassword: '' };

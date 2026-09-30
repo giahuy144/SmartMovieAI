@@ -63,6 +63,45 @@ dotnet run --project backend/AIService/AIService.csproj
 
 ---
 
+## Chạy AuthService và Frontend Angular
+
+Mở hai terminal tại thư mục gốc của repository.
+
+### 1. Chạy backend AuthService
+
+AuthService dùng SQL Server LocalDB/SQL Server với database `SmartMovieAI`. Kiểm tra hoặc điều chỉnh connection string `DefaultConnection` trong `backend/AuthService/appsettings.json` trước khi chạy.
+
+```powershell
+dotnet run --project backend/AuthService/AuthService.csproj
+```
+
+Backend chạy tại `http://localhost:5001`. Có thể kiểm tra API và JWT trên Swagger:
+
+```text
+http://localhost:5001/swagger
+```
+
+### 2. Chạy frontend Angular
+
+Yêu cầu Node.js 18 hoặc 20 LTS (Angular 17 chưa hỗ trợ Node.js 24).
+
+```powershell
+cd frontend/smart-movie-angular
+npm install
+npm start
+```
+
+Mở URL Angular hiển thị trong terminal, thường là `http://localhost:4200`. Frontend gọi AuthService tại `http://localhost:5001`, vì vậy backend phải chạy trước hoặc đồng thời.
+
+### 3. Thử luồng xác thực
+
+1. Mở frontend và đăng nhập bằng `use1` / `123`.
+2. Frontend gửi `userName` cùng mật khẩu Base64 tới `POST /api/auth/login`.
+3. Backend trả JWT; frontend lưu token và chuyển đến `/hello`.
+4. Trang `/hello` gọi `GET /auth` với header `Authorization: Bearer <token>` và nhận `Hello World`.
+
+---
+
 ## 🤖 5. Các Chức năng AI Service chính
 
 1. **Phân tích Cảm xúc (Sentiment Analysis)**: `POST /api/ai/analyze-sentiment`

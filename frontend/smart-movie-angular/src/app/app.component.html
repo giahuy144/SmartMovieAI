@@ -1,23 +1,47 @@
 <div class="auth-container">
   <div class="auth-card">
+    <!-- Header -->
     <div class="auth-header">
-      <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎬</div>
+      <div class="logo-badge">🎬</div>
       <h1>Smart Movie AI</h1>
-      <p>Angular Web Client - SOA Architecture</p>
+      <p class="subtitle">Dịch Vụ Xác Thực Người Dùng & JWT Security (SOA)</p>
     </div>
 
-    <!-- Trang đã đăng nhập -->
-    <div *ngIf="currentUser" style="text-align: center;">
+    <!-- Màn hình sau khi Đăng Nhập -->
+    <div *ngIf="currentUser" class="logged-in-panel">
       <div class="alert-message alert-success">
-        🎉 Bạn đang đăng nhập: <strong>{{ currentUser.name }}</strong>
-        <span class="user-badge" [ngClass]="currentUser.role === 'ADMIN' ? 'badge-admin' : 'badge-user'">
-          {{ currentUser.role }}
-        </span>
+        🎉 Đã đăng nhập: <strong>{{ currentUser.userName }}</strong>
+        <span class="user-badge badge-user">IdUser: {{ currentUser.idUser }}</span>
       </div>
-      <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">
-        Email: {{ currentUser.email }}
-      </p>
-      <button className="btn-submit" (click)="logout()">
+
+      <!-- Khối hiển thị Token JWT đã sinh -->
+      <div class="token-container">
+        <div class="token-header">
+          <span>🔑 JWT Token (Đã lưu Client):</span>
+          <span class="jwt-badge">Bearer</span>
+        </div>
+        <div class="token-box">
+          <code>{{ jwtToken }}</code>
+        </div>
+        <p class="token-hint">💡 Sử dụng Token này gửi trong Header <code>Authorization: Bearer &lt;token&gt;</code></p>
+      </div>
+
+      <!-- Nút test API xác thực Middleware /auth -->
+      <div class="auth-action-box">
+        <button class="btn-test" (click)="testAuthEndpoint()" [disabled]="authTesting">
+          🚀 {{ authTesting ? 'Đang xác thực...' : 'Kiểm Tra Middleware API (/auth)' }}
+        </button>
+      </div>
+
+      <!-- Hiển thị kết quả API /auth "Hello World" -->
+      <div *ngIf="authTestResult" class="test-result-card">
+        <div class="result-title">
+          <span>📡 Kết quả Middleware /auth:</span>
+        </div>
+        <pre class="json-code">{{ authTestResult | json }}</pre>
+      </div>
+
+      <button class="btn-logout" (click)="logout()">
         🚪 Đăng Xuất
       </button>
     </div>
@@ -29,13 +53,13 @@
           class="tab-btn" 
           [class.active]="activeTab === 'login'" 
           (click)="switchTab('login')">
-          Đăng Nhập
+          🔑 Đăng Nhập
         </button>
         <button 
           class="tab-btn" 
           [class.active]="activeTab === 'register'" 
           (click)="switchTab('register')">
-          Đăng Ký
+          📝 Đăng Ký
         </button>
       </div>
 
@@ -44,36 +68,22 @@
       </div>
 
       <form (ngSubmit)="onSubmit()">
-        <div *ngIf="activeTab === 'register'" class="form-group">
-          <label>Họ và Tên</label>
+        <div class="form-group">
+          <label>Tên tài khoản (UserName / Email)</label>
           <div class="input-wrapper">
             <span class="input-icon">👤</span>
             <input 
               type="text" 
-              name="name" 
+              name="userName" 
               class="form-input" 
-              placeholder="Phan Nguyễn Gia Huy"
-              [(ngModel)]="formData.name" 
+              placeholder="Nhập UserName hoặc Email..."
+              [(ngModel)]="formData.userName" 
               required>
           </div>
         </div>
 
         <div class="form-group">
-          <label>Địa chỉ Email</label>
-          <div class="input-wrapper">
-            <span class="input-icon">✉️</span>
-            <input 
-              type="email" 
-              name="email" 
-              class="form-input" 
-              placeholder="user@smartmovie.ai"
-              [(ngModel)]="formData.email" 
-              required>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Mật Khẩu</label>
+          <label>Mật Khẩu (Tự động mã hóa Base64 gửi lên Server)</label>
           <div class="input-wrapper">
             <span class="input-icon">🔒</span>
             <input 
@@ -87,9 +97,20 @@
         </div>
 
         <button type="submit" class="btn-submit" [disabled]="loading">
-          {{ loading ? 'Đang xử lý...' : (activeTab === 'login' ? '🔑 Đăng Nhập' : '📝 Tạo Tài Khoản') }}
+          {{ loading ? 'Đang xử lý JWT...' : (activeTab === 'login' ? '⚡ Đăng Nhập & Sinh Token' : '📝 Tạo Tài Khoản Mới') }}
         </button>
       </form>
+
+      <!-- Bảng mô tả Phụ lục User -->
+      <div class="schema-info">
+        <h4>📋 Bảng dữ liệu người dùng (User):</h4>
+        <ul>
+          <li><code>IdUser</code>: INT (PRIMARY KEY)</li>
+          <li><code>UserName</code>: VARCHAR(255)</li>
+          <li><code>Password</code>: VARCHAR(255) (Mã hóa MD5)</li>
+          <li><code>Token</code>: VARCHAR(255) (JWT Token)</li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>

@@ -1,0 +1,11 @@
+<div class="auth-container"><div class="auth-card">
+  <div class="auth-header"><div class="logo-badge">🎬</div><h1>Smart Movie AI</h1><p class="subtitle">Web recommend phim theo sở thích</p></div>
+  <div class="auth-tabs"><button type="button" class="tab-btn" [class.active]="activeTab === 'login'" (click)="switchTab('login')">Đăng nhập</button><button type="button" class="tab-btn" [class.active]="activeTab === 'register'" (click)="switchTab('register')">Đăng ký</button></div>
+  <div *ngIf="message" class="alert-message" [ngClass]="messageType === 'error' ? 'alert-error' : 'alert-success'">{{ message }}</div>
+  <form (ngSubmit)="submit()">
+    <div class="form-group"><label for="userName">Tên tài khoản</label><input id="userName" name="userName" class="form-input" [(ngModel)]="formData.userName" required></div>
+    <div class="form-group"><label for="password">Mật khẩu</label><input id="password" type="password" name="password" class="form-input" [(ngModel)]="formData.password" required></div>
+    <div *ngIf="activeTab === 'register'" class="form-group"><label for="confirmPassword">Xác nhận mật khẩu</label><input id="confirmPassword" type="password" name="confirmPassword" class="form-input" [(ngModel)]="formData.confirmPassword" required></div>
+    <button type="submit" class="btn-submit" [disabled]="loading">{{ loading ? 'Đang xử lý...' : (activeTab === 'login' ? 'Đăng nhập' : 'Tạo tài khoản') }}</button>
+  </form>
+</div></div>

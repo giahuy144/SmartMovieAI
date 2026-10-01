@@ -154,7 +154,7 @@ CREATE TABLE Comments (
     CONSTRAINT FK_Comments_Review
         FOREIGN KEY (ReviewId)
         REFERENCES Reviews(ReviewId)
-        ON DELETE CASCADE
+        ON DELETE NO ACTION
 );
 
 -- =============================================

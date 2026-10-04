@@ -1,0 +1,435 @@
+<div class="home-page">
+
+  <!-- ==================== NAVBAR ==================== -->
+  <nav class="navbar" [class.scrolled]="isScrolled">
+    <div class="navbar-brand">
+      <span class="brand-icon">🎬</span>
+      <span class="brand-name">SmartMovie AI</span>
+    </div>
+
+    <ul class="navbar-nav">
+      <li><a class="active">🏠 Trang Chủ</a></li>
+      <li><a (click)="scrollTo('movies')">🎥 Phim</a></li>
+      <li><a (click)="scrollTo('ai-tools')">🤖 AI Tools</a></li>
+      <li><a (click)="scrollTo('chatbot')">💬 Chatbot</a></li>
+    </ul>
+
+    <div class="navbar-actions">
+      <ng-container *ngIf="currentUser; else guestNav">
+        <span class="badge badge-cyan">{{ currentUser.userName }}</span>
+        <div class="navbar-avatar" (click)="logout()" title="Đăng xuất">
+          {{ currentUser.userName.charAt(0).toUpperCase() }}
+        </div>
+      </ng-container>
+      <ng-template #guestNav>
+        <button class="btn-ghost" style="padding: 0.4rem 1rem; font-size: 0.85rem;" routerLink="/">Đăng nhập</button>
+        <button class="btn-primary" style="padding: 0.4rem 1rem; font-size: 0.85rem;" routerLink="/">Đăng ký</button>
+      </ng-template>
+    </div>
+  </nav>
+
+  <!-- ==================== HERO ==================== -->
+  <section class="hero-section">
+    <div class="hero-bg">
+      <img class="hero-bg-image"
+        src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1600&auto=format&fit=crop"
+        alt="Cinema Hero" />
+      <div class="hero-bg-gradient"></div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span>🤖</span> <span>Powered by Smart AI SOA</span>
+      </div>
+
+      <h1 class="hero-title">
+        <span>Khám Phá Thế Giới</span>
+        <span class="gradient-text">Điện Ảnh Thông Minh</span>
+      </h1>
+
+      <p class="hero-description">
+        Hệ thống gợi ý phim AI tiên tiến — phân tích cảm xúc review, đề xuất cá nhân hóa
+        và trợ lý chatbot thông minh giúp bạn tìm ra bộ phim hoàn hảo nhất.
+      </p>
+
+      <div class="hero-actions">
+        <button class="btn-primary" (click)="scrollTo('movies')">
+          🎬 Khám Phá Phim
+        </button>
+        <button class="btn-secondary" (click)="scrollTo('ai-tools')">
+          🤖 Thử AI Tools
+        </button>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-value">6+</div>
+          <div class="hero-stat-label">Bộ Phim</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">5</div>
+          <div class="hero-stat-label">AI Services</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">98%</div>
+          <div class="hero-stat-label">Độ Chính Xác</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SEARCH + GENRE FILTER ==================== -->
+  <section class="search-section" id="movies">
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        placeholder="Tìm kiếm phim, đạo diễn, thể loại..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()"
+      />
+      <div class="genre-pills">
+        <button
+          class="genre-pill"
+          [class.active]="activeGenre === 'all'"
+          (click)="filterGenre('all')"
+        >Tất Cả</button>
+        <button
+          *ngFor="let g of genres"
+          class="genre-pill"
+          [class.active]="activeGenre === g"
+          (click)="filterGenre(g)"
+        >{{ g }}</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== MOVIE GRID ==================== -->
+  <section class="section">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title gradient-text">🎬 Phim Đề Xuất AI</h2>
+        <p class="section-subtitle">{{ filteredMovies.length }} bộ phim được AI chọn lọc cho bạn</p>
+      </div>
+      <a class="section-link" (click)="scrollTo('ai-tools')">
+        Xem AI Insights →
+      </a>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loadingMovies" class="loading-state">
+      <div class="spinner"></div>
+      <p>AI đang tải danh sách phim...</p>
+    </div>
+
+    <!-- Movies Grid -->
+    <div class="movies-grid" *ngIf="!loadingMovies">
+      <div
+        class="movie-card"
+        *ngFor="let movie of filteredMovies; let i = index"
+        [style.animation-delay]="(i * 0.08) + 's'"
+        (click)="openMovieDetail(movie)"
+      >
+        <div class="movie-poster-wrap">
+          <img class="movie-poster" [src]="movie.poster" [alt]="movie.title"
+            (error)="onImgError($event)" />
+
+          <div class="movie-overlay">
+            <button class="movie-overlay-btn" (click)="openTrailer(movie, $event)" title="Xem Trailer">▶</button>
+            <button class="movie-overlay-btn play" title="Chi Tiết">🔍</button>
+            <button class="movie-overlay-btn" (click)="toggleFavorite(movie, $event)" [title]="isFavorite(movie) ? 'Bỏ yêu thích' : 'Thêm yêu thích'">
+              {{ isFavorite(movie) ? '❤️' : '🤍' }}
+            </button>
+          </div>
+
+          <div class="movie-rank" *ngIf="i < 3">🏆 TOP {{ i + 1 }}</div>
+
+          <div class="movie-ai-tag" *ngIf="movie.matchScore">
+            <span class="badge badge-purple">🤖 {{ movie.matchScore }}%</span>
+          </div>
+        </div>
+
+        <div class="movie-info">
+          <h3 class="movie-title" [title]="movie.title">{{ movie.title }}</h3>
+          <div class="movie-meta">
+            <span class="movie-genre">{{ movie.genre }}</span>
+            <div class="movie-rating">
+              ⭐ {{ movie.averageRating || '8.5' }}
+            </div>
+          </div>
+          <div class="movie-director">🎬 {{ movie.director }} · {{ movie.releaseDate.substring(0,4) }}</div>
+
+          <div class="movie-match-score" *ngIf="movie.matchScore">
+            <div class="match-bar">
+              <div class="match-fill" [style.width.%]="movie.matchScore"></div>
+            </div>
+            <span class="match-pct">{{ movie.matchScore }}%</span>
+          </div>
+
+          <div class="movie-ai-reason" *ngIf="movie.aiReason">
+            🤖 {{ movie.aiReason }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredMovies.length === 0" style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🎬</div>
+        <p>Không tìm thấy phim phù hợp. Hãy thử từ khóa khác!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== AI TOOLS SECTION ==================== -->
+  <section class="sentiment-section" id="ai-tools">
+    <div class="section-header" style="padding: 0; margin-bottom: 2.5rem;">
+      <div>
+        <h2 class="section-title gradient-text">🤖 AI Sentiment Analyzer</h2>
+        <p class="section-subtitle">Phân tích cảm xúc review phim bằng trí tuệ nhân tạo</p>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;" class="ai-grid">
+      <!-- Sentiment Card -->
+      <div class="sentiment-card">
+        <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.3rem;">💬</span> Nhập Review Phim
+        </h3>
+
+        <textarea
+          class="sentiment-textarea"
+          placeholder="Ví dụ: Phim này tuyệt vời! Cốt truyện hấp dẫn, hình ảnh sống động và diễn xuất xuất sắc..."
+          [(ngModel)]="reviewText"
+        ></textarea>
+
+        <div style="margin-top: 1rem; display: flex; gap: 0.75rem;">
+          <button class="btn-primary" style="flex: 1;" (click)="analyzeSentiment()" [disabled]="analyzingsentiment">
+            {{ analyzingsentiment ? '⏳ Đang phân tích...' : '🔬 Phân Tích AI' }}
+          </button>
+          <button class="btn-ghost" (click)="reviewText = ''; sentimentResult = null">🗑️</button>
+        </div>
+
+        <!-- Sentiment Result -->
+        <div *ngIf="sentimentResult" style="margin-top: 1.2rem;">
+          <div class="sentiment-result"
+            [class.sentiment-positive]="sentimentResult.sentiment === 'Positive'"
+            [class.sentiment-negative]="sentimentResult.sentiment === 'Negative'"
+            [class.sentiment-neutral]="sentimentResult.sentiment === 'Neutral'">
+            <div class="sentiment-emoji">
+              {{ sentimentResult.sentiment === 'Positive' ? '😍' : sentimentResult.sentiment === 'Negative' ? '😞' : '😐' }}
+            </div>
+            <div>
+              <div class="sentiment-label"
+                [style.color]="sentimentResult.sentiment === 'Positive' ? 'var(--success)' : sentimentResult.sentiment === 'Negative' ? 'var(--error)' : 'var(--accent-gold)'">
+                {{ sentimentResult.sentiment === 'Positive' ? 'Tích Cực' : sentimentResult.sentiment === 'Negative' ? 'Tiêu Cực' : 'Trung Lập' }}
+              </div>
+              <div class="sentiment-confidence">
+                Độ chính xác: {{ (sentimentResult.confidence * 100).toFixed(0) }}%
+              </div>
+            </div>
+            <div style="margin-left: auto;">
+              <div class="badge" [class.badge-cyan]="sentimentResult.sentiment === 'Positive'"
+                [class.badge-pink]="sentimentResult.sentiment === 'Negative'"
+                [class.badge-gold]="sentimentResult.sentiment === 'Neutral'">
+                AI Kết Quả
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Recommendations Card -->
+      <div class="sentiment-card">
+        <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.3rem;">🎯</span> AI Gợi Ý Cá Nhân Hóa
+        </h3>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">
+            Thể Loại Yêu Thích
+          </label>
+          <select [(ngModel)]="favoriteGenre" (change)="loadRecommendations()"
+            style="width: 100%; padding: 0.75rem 1rem; background: rgba(15,23,42,0.75); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-main); font-size: 0.9rem; outline: none; font-family: inherit; cursor: pointer;">
+            <option value="Sci-Fi">🚀 Khoa Học Viễn Tưởng</option>
+            <option value="Action">💥 Hành Động</option>
+            <option value="Adventure">🗺️ Phiêu Lưu</option>
+            <option value="Drama">🎭 Tâm Lý</option>
+          </select>
+        </div>
+
+        <div *ngIf="loadingRec" class="loading-state" style="padding: 1.5rem;">
+          <div class="spinner" style="width: 28px; height: 28px; border-width: 2px;"></div>
+          <p style="font-size: 0.8rem;">AI đang phân tích...</p>
+        </div>
+
+        <div *ngIf="!loadingRec && recommendations.length > 0" style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div *ngFor="let rec of recommendations; let i = index"
+            style="display: flex; align-items: center; gap: 12px; padding: 0.75rem; background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.15); border-radius: var(--radius-sm);">
+            <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 900; color: #090d16; flex-shrink: 0;">{{ i + 1 }}</div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-weight: 700; font-size: 0.875rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ rec.title }}</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">{{ rec.reason }}</div>
+            </div>
+            <span class="badge badge-cyan">{{ (rec.matchScore * 100).toFixed(0) }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== AI CHATBOT ==================== -->
+  <section class="chat-section" id="chatbot">
+    <div class="section-header" style="padding: 0; margin-bottom: 2rem;">
+      <div>
+        <h2 class="section-title gradient-text">💬 AI Movie Chatbot</h2>
+        <p class="section-subtitle">Trợ lý thông minh giúp bạn khám phá phim theo sở thích</p>
+      </div>
+    </div>
+
+    <div class="chat-card">
+      <!-- Chat Header -->
+      <div class="chat-header">
+        <div class="chat-avatar">🤖</div>
+        <div>
+          <div class="chat-name">Smart Movie AI Assistant</div>
+          <div class="chat-status">Đang hoạt động · SOA AI Service</div>
+        </div>
+        <div style="margin-left: auto;">
+          <span class="badge badge-cyan">RAG Bot</span>
+        </div>
+      </div>
+
+      <!-- Chat Messages -->
+      <div class="chat-messages" #chatMessages>
+        <div class="chat-msg bot" *ngFor="let msg of chatHistory" [class.user]="msg.role === 'user'">
+          <div class="chat-msg-avatar">
+            {{ msg.role === 'user' ? (currentUser?.userName?.charAt(0)?.toUpperCase() || '👤') : '🤖' }}
+          </div>
+          <div class="chat-bubble">{{ msg.content }}</div>
+        </div>
+
+        <div *ngIf="chatTyping" class="chat-msg bot">
+          <div class="chat-msg-avatar">🤖</div>
+          <div class="chat-bubble" style="display: flex; gap: 4px; align-items: center;">
+            <span style="animation: pulse-glow 0.6s infinite; animation-delay: 0s;">●</span>
+            <span style="animation: pulse-glow 0.6s infinite; animation-delay: 0.2s;">●</span>
+            <span style="animation: pulse-glow 0.6s infinite; animation-delay: 0.4s;">●</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Prompts -->
+      <div style="padding: 0 1.5rem 0.75rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button class="genre-pill" (click)="quickChat('Gợi ý phim khoa học viễn tưởng hay')">🚀 Sci-Fi hay</button>
+        <button class="genre-pill" (click)="quickChat('Phim hành động đỉnh nhất')">💥 Phim hành động</button>
+        <button class="genre-pill" (click)="quickChat('Phim dưới 2 tiếng')">⏱️ Phim ngắn</button>
+        <button class="genre-pill" (click)="quickChat('Phim giống Interstellar')">🌌 Giống Interstellar</button>
+      </div>
+
+      <!-- Input Area -->
+      <div class="chat-input-area">
+        <input
+          class="chat-input"
+          type="text"
+          placeholder="Hỏi AI về phim bạn muốn xem..."
+          [(ngModel)]="chatInput"
+          (keydown.enter)="sendChat()"
+        />
+        <button class="chat-send-btn" (click)="sendChat()" [disabled]="chatTyping">➤</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h2 class="gradient-text">🎬 SmartMovie AI</h2>
+        <p>Hệ thống đánh giá, phân tích và đề xuất phim thông minh dựa trên kiến trúc SOA và Artificial Intelligence.</p>
+      </div>
+
+      <div class="footer-links">
+        <h4>Services</h4>
+        <ul>
+          <li><a>Auth Service · :5001</a></li>
+          <li><a>Movie Service · :5002</a></li>
+          <li><a>Review Service · :5003</a></li>
+          <li><a>Rating Service · :5004</a></li>
+          <li><a>AI Service · :5005</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links">
+        <h4>AI Features</h4>
+        <ul>
+          <li><a>Sentiment Analysis</a></li>
+          <li><a>Review Summary</a></li>
+          <li><a>Movie Recommendation</a></li>
+          <li><a>AI Chatbot (RAG)</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 SmartMovie AI — SOA Architecture Project</p>
+      <div class="footer-services">
+        <span class="service-pill">🔐 Auth</span>
+        <span class="service-pill">🎥 Movies</span>
+        <span class="service-pill">⭐ Review</span>
+        <span class="service-pill">📊 Rating</span>
+        <span class="service-pill">🤖 AI</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== MOVIE DETAIL MODAL ==================== -->
+  <div class="modal-backdrop" *ngIf="selectedMovie" (click)="closeModal($event)">
+    <div class="modal-box" style="position: relative;">
+      <button class="modal-close" (click)="selectedMovie = null">✕</button>
+
+      <div style="position: relative; padding-top: 45%; overflow: hidden; border-radius: var(--radius-lg) var(--radius-lg) 0 0;">
+        <img [src]="selectedMovie.poster" [alt]="selectedMovie.title"
+          style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;"
+          (error)="onImgError($event)" />
+        <div style="position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-card) 0%, transparent 60%);"></div>
+
+        <div style="position: absolute; bottom: 1.5rem; left: 1.5rem;">
+          <div class="badge badge-purple" style="margin-bottom: 0.5rem;">{{ selectedMovie.genre }}</div>
+          <h2 style="font-size: 1.8rem; font-weight: 900;">{{ selectedMovie.title }}</h2>
+        </div>
+      </div>
+
+      <div style="padding: 1.5rem 2rem 2rem;">
+        <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.2rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 6px; color: var(--accent-gold); font-weight: 700;">
+            ⭐ {{ selectedMovie.averageRating || '8.5' }} / 10
+          </div>
+          <div style="color: var(--text-muted); font-size: 0.875rem;">🎬 {{ selectedMovie.director }}</div>
+          <div style="color: var(--text-muted); font-size: 0.875rem;">📅 {{ selectedMovie.releaseDate }}</div>
+          <div style="color: var(--text-muted); font-size: 0.875rem;">⏱️ {{ selectedMovie.duration }} phút</div>
+        </div>
+
+        <p style="color: var(--text-muted); line-height: 1.7; font-size: 0.92rem; margin-bottom: 1.5rem;">
+          {{ selectedMovie.description }}
+        </p>
+
+        <div *ngIf="selectedMovie.aiReason" class="movie-ai-reason" style="margin-bottom: 1.5rem; font-size: 0.85rem; padding: 0.85rem 1rem;">
+          🤖 AI Lý Do Đề Xuất: {{ selectedMovie.aiReason }}
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <a [href]="selectedMovie.trailer" target="_blank" class="btn-primary">
+            ▶ Xem Trailer
+          </a>
+          <button class="btn-secondary" (click)="toggleFavorite(selectedMovie, $event)">
+            {{ isFavorite(selectedMovie) ? '❤️ Đã Yêu Thích' : '🤍 Yêu Thích' }}
+          </button>
+          <button class="btn-ghost" (click)="analyzeMovieReview(selectedMovie)">
+            🔬 Phân Tích AI
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

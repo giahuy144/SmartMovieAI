@@ -5,14 +5,14 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HelloComponent } from './hello/hello.component';
 import { AuthPageComponent } from './features/auth/auth-page.component';
+import { HomeComponent } from './features/home/home.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HelloComponent,
-    AuthPageComponent
+    AuthPageComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,

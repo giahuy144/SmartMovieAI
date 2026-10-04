@@ -86,7 +86,7 @@ http://localhost:5001/swagger
 Yêu cầu Node.js 18 hoặc 20 LTS (Angular 17 chưa hỗ trợ Node.js 24).
 
 ```powershell
-cd frontend/smart-movie-angular
+cd frontend
 npm install
 npm start
 ```
@@ -97,8 +97,8 @@ Mở URL Angular hiển thị trong terminal, thường là `http://localhost:42
 
 1. Mở frontend và đăng nhập bằng `use1` / `123`.
 2. Frontend gửi `userName` cùng mật khẩu Base64 tới `POST /api/auth/login`.
-3. Backend trả JWT; frontend lưu token và chuyển đến `/hello`.
-4. Trang `/hello` gọi `GET /auth` với header `Authorization: Bearer <token>` và nhận `Hello World`.
+3. Backend trả JWT; frontend lưu token và chuyển đến `/home`.
+4. Trang chủ gọi Movie Service (`:5002`) và AI Service (`:5005`) để hiện danh sách phim, phân tích cảm xúc, gợi ý và chatbot. Nếu backend chưa chạy, giao diện dùng dữ liệu dự phòng.
 
 ---
 

@@ -21,6 +21,7 @@ public class AuthDbContext : DbContext
             entity.Property(user => user.UserName).HasColumnName("Username").HasMaxLength(50).IsRequired();
             entity.Property(user => user.Email).HasMaxLength(150).IsRequired();
             entity.Property(user => user.PasswordHash).HasMaxLength(255).IsRequired();
+            entity.Property(user => user.Role).HasMaxLength(20).HasDefaultValue("User").IsRequired();
         });
     }
 }

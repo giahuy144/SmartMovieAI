@@ -37,7 +37,8 @@ public class AuthController : ControllerBase
         authenticatedUser = new
         {
             idUser = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value,
-            userName = User.Identity?.Name
+            userName = User.Identity?.Name,
+            role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "User"
         },
         timestamp = DateTime.UtcNow
     });

@@ -1,0 +1,89 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal-box" style="position: relative; max-width: 640px; padding: 2.2rem;">
+    <button class="modal-close" (click)="closeModal.emit()" title="Đóng">✕</button>
+
+    <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;">
+      <div style="font-size: 2rem;">🎬</div>
+      <div>
+        <h2 style="font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+          Thêm Phim Mới (Admin)
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.82rem;">Thêm dữ liệu phim vào hệ thống SmartMovie AI</p>
+      </div>
+    </div>
+
+    <div *ngIf="message" class="alert-message"
+      [class.alert-error]="messageType === 'error'"
+      [class.alert-success]="messageType === 'success'"
+      style="margin-bottom: 1.2rem;">
+      <span>{{ messageType === 'error' ? '⚠️' : '✅' }}</span>
+      {{ message }}
+    </div>
+
+    <form (ngSubmit)="submit()">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div class="form-group">
+          <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">Tên Phim *</label>
+          <input class="form-input" type="text" placeholder="Ví dụ: Avatar 3" [(ngModel)]="newMovie.title" name="movieTitle" required />
+        </div>
+
+        <div class="form-group">
+          <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">Thể Loại *</label>
+          <select class="form-input" [(ngModel)]="newMovie.genre" name="movieGenre" style="cursor: pointer;">
+            <option value="Sci-Fi">Khoa Học Viễn Tưởng (Sci-Fi)</option>
+            <option value="Action">Hành Động (Action)</option>
+            <option value="Adventure">Phiêu Lưu (Adventure)</option>
+            <option value="Drama">Tâm Lý (Drama)</option>
+            <option value="Animation">Hoạt Hình (Animation)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div class="form-group">
+          <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">Đạo Diễn *</label>
+          <input class="form-input" type="text" placeholder="Đạo diễn..." [(ngModel)]="newMovie.director" name="movieDirector" required />
+        </div>
+
+        <div class="form-group">
+          <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">Thời Lượng (phút)</label>
+          <input class="form-input" type="number" placeholder="120" [(ngModel)]="newMovie.duration" name="movieDuration" />
+        </div>
+
+        <div class="form-group">
+          <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">Ngày Ra Mắt</label>
+          <input class="form-input" type="date" [(ngModel)]="newMovie.releaseDate" name="movieRelease" />
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">Mô Tả Phim</label>
+        <textarea class="form-input" style="height: 80px; resize: vertical;" placeholder="Tóm tắt nội dung cốt truyện..." [(ngModel)]="newMovie.description" name="movieDesc"></textarea>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div class="form-group">
+          <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">URL Poster Hình Ảnh</label>
+          <input class="form-input" type="text" placeholder="https://..." [(ngModel)]="newMovie.poster" name="moviePoster" />
+        </div>
+
+        <div class="form-group">
+          <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">URL Trailer YouTube</label>
+          <input class="form-input" type="text" placeholder="https://youtube.com/..." [(ngModel)]="newMovie.trailer" name="movieTrailer" />
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.35rem;">🤖 Lý Do Đề Xuất Của AI</label>
+        <input class="form-input" type="text" placeholder="Ví dụ: Phim bom tấn khoa học viễn tưởng được cộng đồng đón nhận nồng nhiệt" [(ngModel)]="newMovie.aiReason" name="movieAiReason" />
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button type="button" class="btn-ghost" (click)="closeModal.emit()">Hủy Bỏ</button>
+        <button type="submit" class="btn-primary" [disabled]="submitting">
+          {{ submitting ? '⏳ Đang lưu...' : '💾 Lưu & Thêm Phim' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

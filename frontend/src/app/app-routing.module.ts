@@ -4,8 +4,9 @@ import { AuthPageComponent } from './features/auth/auth-page.component';
 import { HomeComponent } from './features/home/home.component';
 
 const routes: Routes = [
-  { path: '', component: AuthPageComponent, pathMatch: 'full' },
+  { path: '', component: HomeComponent, pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
+  { path: 'auth', component: AuthPageComponent },
   { path: '**', redirectTo: '' }
 ];
 

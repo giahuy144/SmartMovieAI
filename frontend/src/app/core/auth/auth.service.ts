@@ -2,8 +2,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-export interface AuthResponse { message: string; token: string; user: { idUser: number; userName: string }; }
-export interface AuthenticatedResponse { message: string; status: string; }
+export interface AuthResponse { message: string; token: string; user: { idUser: number; userName: string; role?: string }; }
+export interface AuthenticatedResponse { message: string; status: string; authenticatedUser?: { idUser: string; userName: string; role?: string }; }
+
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

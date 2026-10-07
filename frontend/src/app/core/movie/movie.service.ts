@@ -25,9 +25,9 @@ export class MovieApiService {
   private readonly fallbackMovies: Movie[] = [
     {
       id: 1,
-      title: 'Interstellar',
+      title: 'Avengers EndGame',
       description: 'Khi Trái Đất dần trở nên không thể sống được, một nhóm nhà hành tinh học du hành qua lỗ sâu ngoài không gian để tìm kiếm ngôi nhà mới cho nhân loại.',
-      poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop',
+      poster: 'https://m.media-amazon.com/images/S/pv-target-images/ae8093e4439b66320d3cc1f1fb96fa414530202ee4b21cc00a08d6b66de541d6.jpg',
       trailer: 'https://www.youtube.com/watch?v=zSWdZVtXT7E',
       releaseDate: '2014-11-07',
       duration: 169,
@@ -39,17 +39,17 @@ export class MovieApiService {
     },
     {
       id: 2,
-      title: 'Inception',
-      description: 'Kẻ trộm tài ba Dominic Cobb chuyên đột nhập vào tầng tiềm thức và giấc mơ của người khác để đánh cắp các bí mật kinh doanh quan trọng nhất.',
-      poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop',
-      trailer: 'https://www.youtube.com/watch?v=YoHD9XEInc0',
-      releaseDate: '2010-07-16',
-      duration: 148,
-      director: 'Christopher Nolan',
-      genre: 'Sci-Fi / Action',
-      averageRating: 8.9,
+      title: 'Joker',
+      description: 'Một diễn viên hài thất bại dần rơi vào khủng hoảng và trở thành biểu tượng tội phạm tại Gotham.',
+      poster: 'https://image.tmdb.org/t/p/w500/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg',
+      trailer: 'https://www.youtube.com/watch?si=pFRSNSffZSf5v17b&v=zAGVQLHvwOY&feature=youtu.be',
+      releaseDate: '2019-10-04',
+      duration: 122,
+      director: 'Todd Phillips',
+      genre: 'Crime, Drama, Thriller',
+      averageRating: 8.3,
       matchScore: 95,
-      aiReason: 'Cùng đạo diễn Christopher Nolan và phong cách cốt truyện twist đỉnh cao'
+      aiReason: 'Khớp 98% với sở thích phim tâm lý, tội phạm và nhân vật có chiều sâu của bạn.'
     },
     {
       id: 3,
@@ -140,4 +140,19 @@ export class MovieApiService {
       })
     );
   }
+
+  createMovie(movie: Omit<Movie, 'id'>): Observable<Movie> {
+    return this.http.post<Movie>(this.apiBaseUrl, movie).pipe(
+      catchError(() => {
+        const newMovie: Movie = {
+          ...movie,
+          id: Date.now(),
+          averageRating: movie.averageRating || 8.5
+        };
+        this.fallbackMovies.unshift(newMovie);
+        return of(newMovie);
+      })
+    );
+  }
 }
+

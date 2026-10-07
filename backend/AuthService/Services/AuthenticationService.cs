@@ -45,7 +45,7 @@ public class AuthenticationService : IAuthenticationService
     }
 
     private AuthResponse CreateResponse(User user, string message) =>
-        new(message, _tokenService.CreateToken(user), new UserResponse(user.IdUser, user.UserName));
+        new(message, _tokenService.CreateToken(user), new UserResponse(user.IdUser, user.UserName, user.Role));
 
     private static bool TryReadCredentials(string userName, string encodedPassword, out string? normalizedUserName, out string? password, out string? error)
     {

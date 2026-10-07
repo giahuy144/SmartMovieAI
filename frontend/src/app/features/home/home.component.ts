@@ -32,7 +32,13 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   // State
   isScrolled = false;
-  currentUser: { idUser: number; userName: string } | null = null;
+  currentUser: { idUser: number; userName: string; role?: string } | null = null;
+  isAdmin = false;
+
+  // Auth & Add Movie Modals
+  showAuthModal = false;
+  authModalTab: 'login' | 'register' = 'login';
+  showAddMovieModal = false;
 
   // Movies
   movies: Movie[] = [];
@@ -68,10 +74,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   ngOnInit(): void {
     // Load user info
-    const stored = localStorage.getItem('user_info');
-    if (stored) {
-      try { this.currentUser = JSON.parse(stored); } catch { this.currentUser = null; }
-    }
+    this.refreshCurrentUser();
 
     // Load movies
     this.movieService.getMovies().pipe(takeUntil(this.destroy$)).subscribe(movies => {
@@ -120,9 +123,48 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  refreshCurrentUser(): void {
+    const stored = localStorage.getItem('user_info');
+    if (stored) {
+      try {
+        this.currentUser = JSON.parse(stored);
+      } catch {
+        this.currentUser = null;
+      }
+    } else {
+      this.currentUser = null;
+    }
+    // Phân role chuẩn do Backend trả về trong trường user.role
+    const roleLower = (this.currentUser?.role || '').toLowerCase();
+    this.isAdmin = roleLower === 'admin';
+  }
+
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/']);
+    this.currentUser = null;
+    this.isAdmin = false;
+  }
+
+  // ===================== Modal Handlers =====================
+  openAuthModal(tab: 'login' | 'register' = 'login'): void {
+    this.authModalTab = tab;
+    this.showAuthModal = true;
+  }
+
+  onAuthSuccess(): void {
+    this.refreshCurrentUser();
+    this.showAuthModal = false;
+  }
+
+  openAddMovieModal(): void {
+    this.showAddMovieModal = true;
+  }
+
+  onMovieCreated(created: Movie): void {
+    if (!this.movies.some(m => m.id === created.id)) {
+      this.movies.unshift(created);
+    }
+    this.applyFilter();
   }
 
   // ===================== Movie Actions =====================

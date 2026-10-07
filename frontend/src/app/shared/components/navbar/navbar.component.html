@@ -1,0 +1,46 @@
+<nav class="navbar" [class.scrolled]="isScrolled">
+  <div class="navbar-brand">
+    <span class="brand-icon">🎬</span>
+    <span class="brand-name">SmartMovie AI</span>
+  </div>
+
+  <ul class="navbar-nav">
+    <li><a class="active">🏠 Trang Chủ</a></li>
+    <li><a (click)="scrollTo('movies')">🎥 Phim</a></li>
+    <li><a (click)="scrollTo('ai-tools')">🤖 AI Tools</a></li>
+    <li><a (click)="scrollTo('chatbot')">💬 Chatbot</a></li>
+  </ul>
+
+  <!-- Thanh Tìm kiếm phim bên phải Header, cạnh Avatar/Đăng nhập -->
+  <div class="navbar-actions">
+    <div class="navbar-search">
+      <span class="navbar-search-icon">🔍</span>
+      <input
+        type="text"
+        class="navbar-search-input"
+        placeholder="Tìm phim..."
+        [ngModel]="searchQuery"
+        (ngModelChange)="onSearchChange($event)"
+      />
+      <button *ngIf="searchQuery" class="navbar-search-clear" (click)="clearSearch()" title="Xóa">✕</button>
+    </div>
+
+    <!-- Nút Thêm Phim dành riêng cho Admin -->
+    <button *ngIf="isAdmin" class="btn-primary" style="padding: 0.4rem 0.9rem; font-size: 0.82rem; display: flex; align-items: center; gap: 4px;" (click)="openAddMovie.emit()">
+      ➕ Thêm Phim
+    </button>
+
+    <ng-container *ngIf="currentUser; else guestNav">
+      <span class="badge" [class.badge-gold]="isAdmin" [class.badge-cyan]="!isAdmin">
+        {{ isAdmin ? '👑 Admin' : currentUser.userName }}
+      </span>
+      <div class="navbar-avatar" (click)="logoutUser.emit()" [title]="'Đăng xuất (' + currentUser.userName + ')'">
+        {{ currentUser.userName.charAt(0).toUpperCase() }}
+      </div>
+    </ng-container>
+    <ng-template #guestNav>
+      <button class="btn-ghost" style="padding: 0.4rem 0.9rem; font-size: 0.85rem;" (click)="openAuth.emit('login')">Đăng nhập</button>
+      <button class="btn-primary" style="padding: 0.4rem 0.9rem; font-size: 0.85rem;" (click)="openAuth.emit('register')">Đăng ký</button>
+    </ng-template>
+  </div>
+</nav>

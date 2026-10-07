@@ -1,0 +1,55 @@
+<footer class="footer">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <h2 class="gradient-text">🎬 SmartMovie AI</h2>
+      <p>Hệ thống đánh giá, phân tích và đề xuất phim thông minh dựa trên kiến trúc Microservices và Artificial Intelligence.</p>
+    </div>
+
+    <!-- User Quick Links -->
+    <div class="footer-links">
+      <h4>Khám Phá & Điều Hướng</h4>
+      <ul>
+        <li><a (click)="scrollTo('movies')" style="cursor: pointer;">🎬 Phim Đề Xuất</a></li>
+        <li><a (click)="onFilterGenre('Sci-Fi')" style="cursor: pointer;">🚀 Khoa Học Viễn Tưởng</a></li>
+        <li><a (click)="onFilterGenre('Action')" style="cursor: pointer;">💥 Hành Động Bom Tấn</a></li>
+        <li><a (click)="onFilterGenre('Drama')" style="cursor: pointer;">🎭 Tâm Lý & Tội Phạm</a></li>
+        <li><a (click)="onFilterGenre('Adventure')" style="cursor: pointer;">🗺️ Phiêu Lưu Thám Hiểm</a></li>
+      </ul>
+    </div>
+
+    <!-- AI Features & Support -->
+    <div class="footer-links">
+      <h4>Tính Năng AI & Hỗ Trợ</h4>
+      <ul>
+        <li><a (click)="scrollTo('ai-tools')" style="cursor: pointer;">🤖 AI Sentiment Analyzer</a></li>
+        <li><a (click)="scrollTo('ai-tools')" style="cursor: pointer;">🎯 Gợi Ý Cá Nhân Hóa</a></li>
+        <li><a (click)="scrollTo('chatbot')" style="cursor: pointer;">💬 Trợ Lý AI Chatbot</a></li>
+        <li><a style="cursor: pointer;">📜 Chính Sách & Bảo Mật</a></li>
+        <li><a style="cursor: pointer;">🛠️ Hỗ Trợ Kỹ Thuật</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Admin & System Status -->
+  <div *ngIf="isAdmin" style="margin: 1.5rem 0 0.5rem; padding: 1rem 1.5rem; background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 1.1rem;">👑</span>
+      <span style="font-weight: 700; font-size: 0.9rem; color: var(--accent-gold);">Bảng Điều Khiển Admin (Quản Trị Viên)</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 1.5rem; font-size: 0.82rem; color: var(--text-muted); flex-wrap: wrap;">
+      <span>Trạng thái: <strong style="color: var(--success);">Operational 🟢</strong></span>
+      <span>Độ trễ trung bình: <strong style="color: var(--accent-cyan);">~18ms</strong></span>
+      <span>Phim đã quản lý: <strong>{{ totalMovies }}</strong></span>
+      <button class="btn-primary" style="padding: 0.35rem 0.85rem; font-size: 0.8rem;" (click)="openAddMovie.emit()">➕ Thêm Phim Mới</button>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2026 SmartMovie AI — Next-Gen AI Cinema Experience</p>
+    <div class="footer-services">
+      <span class="service-pill" style="color: var(--success); border-color: rgba(16, 185, 129, 0.3);">🟢 All Systems Operational</span>
+      <span class="service-pill">⚡ Latency: 18ms</span>
+      <span class="service-pill">🛡️ Secure JWT</span>
+    </div>
+  </div>
+</footer>

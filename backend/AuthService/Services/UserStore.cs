@@ -24,7 +24,8 @@ public class SqlUserStore : IUserStore
         {
             UserName = userName,
             Email = $"{userName.Trim().ToLowerInvariant()}@smartmovie.local",
-            PasswordHash = passwordHash
+            PasswordHash = passwordHash,
+            Role = "User"
         };
 
         _db.Users.Add(user);

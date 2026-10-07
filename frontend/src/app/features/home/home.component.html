@@ -1,32 +1,18 @@
 <div class="home-page">
 
   <!-- ==================== NAVBAR ==================== -->
-  <nav class="navbar" [class.scrolled]="isScrolled">
-    <div class="navbar-brand">
-      <span class="brand-icon">🎬</span>
-      <span class="brand-name">SmartMovie AI</span>
-    </div>
+  <app-navbar
+    [isScrolled]="isScrolled"
+    [currentUser]="currentUser"
+    [isAdmin]="isAdmin"
+    [(searchQuery)]="searchQuery"
+    (searchInput)="onSearch()"
+    (openAuth)="openAuthModal($event)"
+    (openAddMovie)="openAddMovieModal()"
+    (logoutUser)="logout()"
+    (navigateSection)="scrollTo($event)">
+  </app-navbar>
 
-    <ul class="navbar-nav">
-      <li><a class="active">🏠 Trang Chủ</a></li>
-      <li><a (click)="scrollTo('movies')">🎥 Phim</a></li>
-      <li><a (click)="scrollTo('ai-tools')">🤖 AI Tools</a></li>
-      <li><a (click)="scrollTo('chatbot')">💬 Chatbot</a></li>
-    </ul>
-
-    <div class="navbar-actions">
-      <ng-container *ngIf="currentUser; else guestNav">
-        <span class="badge badge-cyan">{{ currentUser.userName }}</span>
-        <div class="navbar-avatar" (click)="logout()" title="Đăng xuất">
-          {{ currentUser.userName.charAt(0).toUpperCase() }}
-        </div>
-      </ng-container>
-      <ng-template #guestNav>
-        <button class="btn-ghost" style="padding: 0.4rem 1rem; font-size: 0.85rem;" routerLink="/">Đăng nhập</button>
-        <button class="btn-primary" style="padding: 0.4rem 1rem; font-size: 0.85rem;" routerLink="/">Đăng ký</button>
-      </ng-template>
-    </div>
-  </nav>
 
   <!-- ==================== HERO ==================== -->
   <section class="hero-section">
@@ -78,17 +64,14 @@
     </div>
   </section>
 
-  <!-- ==================== SEARCH + GENRE FILTER ==================== -->
+  <!-- ==================== GENRE FILTER ==================== -->
   <section class="search-section" id="movies">
-    <div class="search-bar">
-      <span class="search-icon">🔍</span>
-      <input
-        type="text"
-        placeholder="Tìm kiếm phim, đạo diễn, thể loại..."
-        [(ngModel)]="searchQuery"
-        (input)="onSearch()"
-      />
-      <div class="genre-pills">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 1.1rem;">🏷️</span>
+        <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Khám Phá Theo Thể Loại:</span>
+      </div>
+      <div class="genre-pills" style="padding: 0;">
         <button
           class="genre-pill"
           [class.active]="activeGenre === 'all'"
@@ -101,6 +84,9 @@
           (click)="filterGenre(g)"
         >{{ g }}</button>
       </div>
+      <button *ngIf="isAdmin" class="btn-primary" style="padding: 0.45rem 1rem; font-size: 0.85rem;" (click)="openAddMovieModal()">
+        ➕ Thêm Phim Mới
+      </button>
     </div>
   </section>
 
@@ -341,95 +327,40 @@
   </section>
 
   <!-- ==================== FOOTER ==================== -->
-  <footer class="footer">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <h2 class="gradient-text">🎬 SmartMovie AI</h2>
-        <p>Hệ thống đánh giá, phân tích và đề xuất phim thông minh dựa trên kiến trúc SOA và Artificial Intelligence.</p>
-      </div>
-
-      <div class="footer-links">
-        <h4>Services</h4>
-        <ul>
-          <li><a>Auth Service · :5001</a></li>
-          <li><a>Movie Service · :5002</a></li>
-          <li><a>Review Service · :5003</a></li>
-          <li><a>Rating Service · :5004</a></li>
-          <li><a>AI Service · :5005</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-links">
-        <h4>AI Features</h4>
-        <ul>
-          <li><a>Sentiment Analysis</a></li>
-          <li><a>Review Summary</a></li>
-          <li><a>Movie Recommendation</a></li>
-          <li><a>AI Chatbot (RAG)</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-      <p>© 2026 SmartMovie AI — SOA Architecture Project</p>
-      <div class="footer-services">
-        <span class="service-pill">🔐 Auth</span>
-        <span class="service-pill">🎥 Movies</span>
-        <span class="service-pill">⭐ Review</span>
-        <span class="service-pill">📊 Rating</span>
-        <span class="service-pill">🤖 AI</span>
-      </div>
-    </div>
-  </footer>
+  <!-- ==================== FOOTER ==================== -->
+  <app-footer
+    [isAdmin]="isAdmin"
+    [totalMovies]="movies.length"
+    (navigateSection)="scrollTo($event)"
+    (filterByGenre)="filterGenre($event)"
+    (openAddMovie)="openAddMovieModal()">
+  </app-footer>
 
   <!-- ==================== MOVIE DETAIL MODAL ==================== -->
-  <div class="modal-backdrop" *ngIf="selectedMovie" (click)="closeModal($event)">
-    <div class="modal-box" style="position: relative;">
-      <button class="modal-close" (click)="selectedMovie = null">✕</button>
+  <app-movie-detail-modal
+    *ngIf="selectedMovie"
+    [movie]="selectedMovie"
+    [isFavorite]="isFavorite(selectedMovie)"
+    (closeModal)="selectedMovie = null"
+    (toggleFavorite)="toggleFavorite($event, $any($event))"
+    (analyzeAi)="analyzeMovieReview($event)">
+  </app-movie-detail-modal>
 
-      <div style="position: relative; padding-top: 45%; overflow: hidden; border-radius: var(--radius-lg) var(--radius-lg) 0 0;">
-        <img [src]="selectedMovie.poster" [alt]="selectedMovie.title"
-          style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;"
-          (error)="onImgError($event)" />
-        <div style="position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-card) 0%, transparent 60%);"></div>
+  <!-- ==================== AUTH POPUP MODAL (CENTER SCREEN) ==================== -->
+  <app-auth-modal
+    *ngIf="showAuthModal"
+    [initialTab]="authModalTab"
+    (closeModal)="showAuthModal = false"
+    (authSuccess)="onAuthSuccess()">
+  </app-auth-modal>
 
-        <div style="position: absolute; bottom: 1.5rem; left: 1.5rem;">
-          <div class="badge badge-purple" style="margin-bottom: 0.5rem;">{{ selectedMovie.genre }}</div>
-          <h2 style="font-size: 1.8rem; font-weight: 900;">{{ selectedMovie.title }}</h2>
-        </div>
-      </div>
-
-      <div style="padding: 1.5rem 2rem 2rem;">
-        <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.2rem; flex-wrap: wrap;">
-          <div style="display: flex; align-items: center; gap: 6px; color: var(--accent-gold); font-weight: 700;">
-            ⭐ {{ selectedMovie.averageRating || '8.5' }} / 10
-          </div>
-          <div style="color: var(--text-muted); font-size: 0.875rem;">🎬 {{ selectedMovie.director }}</div>
-          <div style="color: var(--text-muted); font-size: 0.875rem;">📅 {{ selectedMovie.releaseDate }}</div>
-          <div style="color: var(--text-muted); font-size: 0.875rem;">⏱️ {{ selectedMovie.duration }} phút</div>
-        </div>
-
-        <p style="color: var(--text-muted); line-height: 1.7; font-size: 0.92rem; margin-bottom: 1.5rem;">
-          {{ selectedMovie.description }}
-        </p>
-
-        <div *ngIf="selectedMovie.aiReason" class="movie-ai-reason" style="margin-bottom: 1.5rem; font-size: 0.85rem; padding: 0.85rem 1rem;">
-          🤖 AI Lý Do Đề Xuất: {{ selectedMovie.aiReason }}
-        </div>
-
-        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-          <a [href]="selectedMovie.trailer" target="_blank" class="btn-primary">
-            ▶ Xem Trailer
-          </a>
-          <button class="btn-secondary" (click)="toggleFavorite(selectedMovie, $event)">
-            {{ isFavorite(selectedMovie) ? '❤️ Đã Yêu Thích' : '🤍 Yêu Thích' }}
-          </button>
-          <button class="btn-ghost" (click)="analyzeMovieReview(selectedMovie)">
-            🔬 Phân Tích AI
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- ==================== ADMIN ADD MOVIE MODAL ==================== -->
+  <app-add-movie-modal
+    *ngIf="showAddMovieModal"
+    (closeModal)="showAddMovieModal = false"
+    (movieCreated)="onMovieCreated($event)">
+  </app-add-movie-modal>
 
 </div>
+
+

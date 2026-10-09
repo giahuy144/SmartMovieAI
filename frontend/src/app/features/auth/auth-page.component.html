@@ -1,0 +1,207 @@
+<div class="auth-container">
+
+  <!-- ====== LEFT: Auth Card ====== -->
+  <div class="auth-left">
+    <!-- Background blobs -->
+    <div style="position: absolute; top: -100px; left: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,242,254,0.08) 0%, transparent 70%); pointer-events: none; z-index: 0;"></div>
+    <div style="position: absolute; bottom: -80px; right: -80px; width: 350px; height: 350px; background: radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%); pointer-events: none; z-index: 0;"></div>
+
+    <div class="auth-card">
+
+      <!-- Logo -->
+      <div class="auth-logo">
+        <div class="auth-logo-icon">🎬</div>
+        <h1>SmartMovie AI</h1>
+        <p>Hệ thống đề xuất phim thông minh với SOA + AI</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="activeTab === 'login'"
+          (click)="switchTab('login')"
+        >🔑 Đăng Nhập</button>
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="activeTab === 'register'"
+          (click)="switchTab('register')"
+        >✨ Đăng Ký</button>
+      </div>
+
+      <!-- Alert Message -->
+      <div *ngIf="message" class="alert-message"
+        [class.alert-error]="messageType === 'error'"
+        [class.alert-success]="messageType === 'success'">
+        <span>{{ messageType === 'error' ? '⚠️' : '✅' }}</span>
+        {{ message }}
+      </div>
+
+      <!-- Form -->
+      <form (ngSubmit)="submit()" autocomplete="off">
+
+        <!-- Username -->
+        <div class="form-group">
+          <label for="userName">Tên Tài Khoản</label>
+          <div class="input-wrapper">
+            <span class="input-icon">👤</span>
+            <input
+              id="userName"
+              name="userName"
+              class="form-input"
+              type="text"
+              placeholder="Nhập tên tài khoản..."
+              [(ngModel)]="formData.userName"
+              required
+              autocomplete="username"
+            />
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password">Mật Khẩu</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🔒</span>
+            <input
+              id="password"
+              name="password"
+              class="form-input"
+              [type]="showPass ? 'text' : 'password'"
+              placeholder="Nhập mật khẩu..."
+              [(ngModel)]="formData.password"
+              required
+              autocomplete="current-password"
+            />
+            <button type="button"
+              style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1rem;"
+              (click)="showPass = !showPass">
+              {{ showPass ? '🙈' : '👁️' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Confirm Password (Register only) -->
+        <div class="form-group" *ngIf="activeTab === 'register'">
+          <label for="confirmPassword">Xác Nhận Mật Khẩu</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🔐</span>
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              class="form-input"
+              [type]="showPass ? 'text' : 'password'"
+              placeholder="Nhập lại mật khẩu..."
+              [(ngModel)]="formData.confirmPassword"
+              required
+              autocomplete="new-password"
+            />
+          </div>
+        </div>
+
+        <!-- Password Strength (Register only) -->
+        <div *ngIf="activeTab === 'register' && formData.password" style="margin-bottom: 1rem;">
+          <div style="display: flex; gap: 4px; margin-bottom: 4px;">
+            <div *ngFor="let i of [1,2,3,4]"
+              style="height: 3px; flex: 1; border-radius: 2px; transition: all 0.3s ease;"
+              [style.background]="getPasswordStrengthColor(i)">
+            </div>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">
+            Độ mạnh: <span [style.color]="getPasswordStrengthLabel().color">{{ getPasswordStrengthLabel().text }}</span>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-submit" [disabled]="loading">
+          <span *ngIf="loading" style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(9,13,22,0.4); border-top-color: #090d16; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px;"></span>
+          {{ loading ? 'Đang xử lý...' : (activeTab === 'login' ? '🚀 Đăng Nhập' : '✨ Tạo Tài Khoản') }}
+        </button>
+
+      </form>
+
+
+
+      <!-- Services info -->
+      <div style="margin-top: 1.5rem; padding-top: 1.2rem; border-top: 1px solid var(--border-subtle);">
+        <div style="font-size: 0.72rem; color: var(--text-dim); text-align: center; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">SOA Microservices</div>
+        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; justify-content: center;">
+          <span class="badge badge-cyan" style="font-size: 0.65rem;">🔐 Auth :5001</span>
+          <span class="badge badge-purple" style="font-size: 0.65rem;">🎥 Movie :5002</span>
+          <span class="badge badge-pink" style="font-size: 0.65rem;">🤖 AI :5005</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ====== RIGHT: Cinematic Visual ====== -->
+  <div class="auth-right">
+    <div class="auth-bg-overlay"></div>
+
+    <div style="position: relative; z-index: 1; text-align: center; padding: 3rem; animation: fadeInUp 0.8s ease;">
+      <!-- Movie Showcase Cards -->
+      <div style="position: relative; width: 380px; height: 520px; margin: 0 auto 2rem;">
+
+        <!-- Card 1 (back) -->
+        <div style="position: absolute; top: 30px; left: -20px; width: 220px; height: 320px; border-radius: 20px; overflow: hidden; transform: rotate(-8deg); box-shadow: 0 20px 60px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);">
+          <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&auto=format&fit=crop"
+            alt="Inception" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.7;" />
+          <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(9,13,22,0.8) 0%, transparent 50%);"></div>
+          <div style="position: absolute; bottom: 1rem; left: 1rem; font-size: 0.8rem; font-weight: 700;">Inception</div>
+        </div>
+
+        <!-- Card 2 (front-center) -->
+        <div style="position: absolute; top: 0; left: 80px; width: 240px; height: 360px; border-radius: 24px; overflow: hidden; transform: rotate(2deg); box-shadow: 0 30px 80px rgba(0,0,0,0.6); border: 1px solid rgba(0,242,254,0.3);">
+          <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&auto=format&fit=crop"
+            alt="Interstellar" style="width: 100%; height: 100%; object-fit: cover;" />
+          <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(9,13,22,0.9) 0%, transparent 50%);"></div>
+          <div style="position: absolute; bottom: 1.2rem; left: 1.2rem;">
+            <div class="badge badge-cyan" style="margin-bottom: 0.4rem; font-size: 0.65rem;">🤖 AI Pick · 98%</div>
+            <div style="font-size: 0.95rem; font-weight: 800;">Interstellar</div>
+            <div style="font-size: 0.75rem; color: var(--accent-gold);">⭐ 9.2 / 10</div>
+          </div>
+        </div>
+
+        <!-- Card 3 (back right) -->
+        <div style="position: absolute; top: 50px; right: -10px; width: 200px; height: 290px; border-radius: 16px; overflow: hidden; transform: rotate(8deg); box-shadow: 0 20px 60px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.08);">
+          <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&auto=format&fit=crop"
+            alt="Dune" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.7;" />
+          <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(9,13,22,0.8) 0%, transparent 50%);"></div>
+          <div style="position: absolute; bottom: 1rem; left: 1rem; font-size: 0.8rem; font-weight: 700;">Dune: Part Two</div>
+        </div>
+
+        <!-- Floating AI badge -->
+        <div style="position: absolute; top: -10px; right: 20px; background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink)); border-radius: 12px; padding: 8px 12px; font-size: 0.75rem; font-weight: 800; color: #fff; animation: float 3s ease-in-out infinite; box-shadow: 0 8px 25px rgba(139,92,246,0.4);">
+          🤖 AI Powered
+        </div>
+      </div>
+
+      <!-- Text info -->
+      <h2 style="font-size: 1.6rem; font-weight: 900; margin-bottom: 0.75rem; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+        Khám Phá Điện Ảnh Thông Minh
+      </h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 320px; margin: 0 auto; line-height: 1.6;">
+        Hệ thống AI phân tích cảm xúc review, gợi ý phim cá nhân hóa và chatbot trợ lý thông minh.
+      </p>
+
+      <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem;">
+        <div style="text-align: center;">
+          <div style="font-size: 1.4rem; font-weight: 900; color: var(--accent-cyan);">5</div>
+          <div style="font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px;">Services</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 1.4rem; font-weight: 900; color: var(--accent-purple);">4</div>
+          <div style="font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px;">AI Features</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 1.4rem; font-weight: 900; color: var(--accent-pink);">98%</div>
+          <div style="font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px;">Accuracy</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
